@@ -91,7 +91,7 @@ int main()
                 coordinates->setFont(font);
                 coordinates->setPosition(sf::Vector2f(0, (int)sizeY-(sizeX/8)));
                 coordinates->setFillColor(sf::Color::Black);
-                buffer = "x : " + std::to_string((bufferVector.x-centerX)/ratio_) + "; y : " + std::to_string((bufferVector.y-centerY)/ratio_);
+                buffer = "x : " + std::to_string((bufferVector.x-centerX)/ratio_) + "; y : " + std::to_string(-(bufferVector.y-centerY)/ratio_);
                 coordinates->setString(buffer);
                 window->draw(*coordinates);
                 window->display();

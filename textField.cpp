@@ -73,44 +73,41 @@ Formula* textField::eventget(sf::Event event, sf::RenderWindow* window, Formula*
                             ok = false;
                         }
                     }
-
-                    if(event.type == sf::Event::EventType::KeyPressed && event.key.code == sf::Keyboard::Key::BackSpace){
+                    if(event.type == sf::Event::EventType::TextEntered){
+                        //std::cout << event.text.unicode << std::endl;
+                        if((event.text.unicode < 58 && event.text.unicode > 47)||(event.text.unicode < 123 && event.text.unicode > 96) || event.text.unicode == 94 || event.text.unicode == 45 || event.text.unicode == 43 || event.text.unicode== 47 || event.text.unicode == 42 ){
                             sf::Font font;
-                            if (!font.loadFromFile("consolas.ttf"))
-                            {
-                                std::cout << "error no consolas" << std::endl;
-                            }
+                            if (!font.loadFromFile("consolas.ttf")){std::cout << "error no consolas" << std::endl;}
                             text->setFont(font);
                             text->setPosition(sf::Vector2f(x, y));
                             text->setFillColor(sf::Color::Black);
-                            sf:String bufferStr = "";
-                            for ( int i = 0; i < entered.getSize()-1 ; i++){
-                                bufferStr += entered[i];
-                            }
-                            entered = bufferStr;
+                            entered += event.text.unicode;
                             text->setString(entered);
                             drawCoordinateSystem(ratio_, unit, centerX, centerY, sizeX, sizeY, window);
                             drawFunction(formula, ratio_, centerX, centerY, sizeX, sizeY, window);
                             window->draw(*field);
                             window->draw(*text);
                             window->display();
-                    }
-                    else if(event.type == sf::Event::EventType::TextEntered){
-                        sf::Font font;
-                        if (!font.loadFromFile("consolas.ttf"))
-                        {
-                            std::cout << "error no consolas" << std::endl;
+                        }else if(event.text.unicode == 8){
+                            sf::String bufferStr = "";
+                            for(int i = 0; i < entered.getSize()-1; i++){
+                                bufferStr += entered[i];
+                            }
+                            entered = "";
+                            entered = bufferStr;
+
+                            sf::Font font;
+                            if (!font.loadFromFile("consolas.ttf")){std::cout << "error no consolas" << std::endl;}
+                            text->setFont(font);
+                            text->setPosition(sf::Vector2f(x, y));
+                            text->setFillColor(sf::Color::Black);
+                            text->setString(entered);
+                            drawCoordinateSystem(ratio_, unit, centerX, centerY, sizeX, sizeY, window);
+                            drawFunction(formula, ratio_, centerX, centerY, sizeX, sizeY, window);
+                            window->draw(*field);
+                            window->draw(*text);
+                            window->display();
                         }
-                        text->setFont(font);
-                        text->setPosition(sf::Vector2f(x, y));
-                        text->setFillColor(sf::Color::Black);
-                        entered += event.text.unicode;
-                        text->setString(entered);
-                        drawCoordinateSystem(ratio_, unit, centerX, centerY, sizeX, sizeY, window);
-                        drawFunction(formula, ratio_, centerX, centerY, sizeX, sizeY, window);
-                        window->draw(*field);
-                        window->draw(*text);
-                        window->display();
                     }
                 }
             }
