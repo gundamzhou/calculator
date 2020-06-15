@@ -75,7 +75,8 @@ Formula* textField::eventget(sf::Event event, sf::RenderWindow* window, Formula*
                     }
                     if(event.type == sf::Event::EventType::TextEntered){
                         //std::cout << event.text.unicode << std::endl;
-                        if((event.text.unicode < 58 && event.text.unicode > 47)||(event.text.unicode < 123 && event.text.unicode > 96) || event.text.unicode == 94 || event.text.unicode == 45 || event.text.unicode == 43 || event.text.unicode== 47 || event.text.unicode == 42 ){
+                        //autorized characters
+                        if((event.text.unicode < 58 && event.text.unicode > 47)||(event.text.unicode < 123 && event.text.unicode > 96) || event.text.unicode == 94 || event.text.unicode == 45 || event.text.unicode == 43 || event.text.unicode== 47 || event.text.unicode == 42 || event.text.unicode == 40 || event.text.unicode == 41){
                             sf::Font font;
                             if (!font.loadFromFile("consolas.ttf")){std::cout << "error no consolas" << std::endl;}
                             text->setFont(font);

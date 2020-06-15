@@ -1,132 +1,215 @@
 #include <iostream>
+#include <cmath>
 #include <stdio.h>
 #include <stdlib.h>
-#include <SFML/Graphics.hpp>
-#include <math.h>
-#include <vector>
-#include <string>
-#include <iostream>
-#include <vector>
-#include <string>
-#include <cmath>
 #include "formula.hpp"
 
-bool Formula::isOperation(char know) {
-    const int lengthListe = 5;
-    char liste[lengthListe] = { '^', '/', '+', '-', '*' };
-    for (int i = 0; i < lengthListe; i++) {
-        if (know == liste[i]) {
-            return true;
-        }
+std::string Formula::getFormula(){
+    //formula getter
+    return this->formula;
+}
+
+void Formula::setFormula(std::string nFormula){
+    //formula setter
+    this->formula = nFormula;
+}
+
+double Formula::getOrdinate(double absicia){
+    //to get the ordinate
+    return this->fromString(this->formula, absicia);
+}
+
+Formula::Formula(){
+    //classic call
+    this->formula = "x";
+}
+
+Formula::Formula(std::string nFormula){
+    //overload with given formula
+    this->formula = nFormula;
+}
+
+double Formula::compute(double a, double b, char op){
+    //simple operation function
+    switch(op){
+        case '+':
+            return a + b;
+            break;
+        case '-':
+            return a - b;
+            break;
+        case '*':
+            return a * b;
+            break;
+        case '/':
+            return a / b;
+            break;
+        case '^':
+            return pow(a, b);
+            break;
     }
-    return false;
 }
 
-Formula::Formula() {
-    f_iteration = 0;
-    str_given = "x^2-1";
-    this->appendFromString("x^2-1");
-}
+double Formula::fromString(std::string formula, double absicia){
+    /*
+    function which take a string which contain a formula and compute it swaping x by a given value
+    warning : 4*x^3 = (4*x)^3
+    warning : 10/100*10 = (10/100)*10
+    I keep this since it's still logic and it easier to code :3
+    author: zhou Killian
+    contact : killian.zhou@efrei.net
 
-Formula::Formula(std::string formulas){
-    f_iteration = 0;
-    str_given = formulas;
-    this->appendFromString(formulas);
-}
+    if you want to use this function for your programs plz don't forget to quote me, I even prefer if you ask me first
 
-void Formula::appendFromString(std::string formula) {
-    std::vector<std::string> buffer;
-    f_iteration = 0;
-    buffer.push_back("");
-    buffer.push_back("");
-    for (int i = 0; i < formula.length(); i++)
-    {
-        if (formula[i] == 'x') {
-            buffer[0] = formula[i];
-            buffer[1] = "unknown";
-        }
-        else if (formula[i] >= 48 && formula[i] < 58 || formula[i] == (char)46) {
-            buffer[0] = formula[i];
-            buffer[1] = "integer";
-        }
-        else if (isOperation(formula[i])) {
-            buffer[0] = formula[i];
-            buffer[1] = "operation";
-        }
-
-        //free the buffer
-        if (f_iteration) {
-            if (buffer[1] == this->f_decomposed[f_iteration - 1][1]) {
-                this->f_decomposed[f_iteration - 1][0] += buffer[0];
+    */
+    double buffer = 0, buffer2 = 0, resutlt = 0, base = 0;
+    char operation = ' ', operation2 = ' ';
+    int parenthesis_counter = 0;
+    std::string str_buffer = "", command_buffer = "";
+    bool decimal = false, parenthesis = false, constant = false;
+    try{
+        for(int i = 0; i < formula.size(); i++){
+            //std::cout << "resutlt = " << resutlt << std::endl << "character = " << formula[i] << std::endl << std::endl;
+            if(formula[i] != ' '){
+                if(parenthesis){
+                    if(formula[i]==','){
+                        if(str_buffer != ""){
+                            base = fromString(str_buffer, absicia);
+                        }else{
+                            throw 30;
+                        }
+                        str_buffer = "";
+                    }else if(formula[i] == '('){
+                        parenthesis_counter++;
+                        str_buffer += formula[i];
+                    }else if(formula[i] == ')'){
+                        parenthesis_counter--;
+                        if(parenthesis_counter == 0){
+                            parenthesis = false;
+                            if(str_buffer != ""){
+                                buffer = fromString(str_buffer, absicia);
+                            }
+                            if(command_buffer.compare("cos") == 0){
+                                buffer = cos(buffer);
+                            }else if(command_buffer.compare("arccos") == 0){
+                                buffer = acos(buffer);
+                            }else if(command_buffer.compare("arcsin") == 0){
+                                buffer = asin(buffer);
+                            }else if(command_buffer.compare("sin") == 0){
+                                buffer = sin(buffer);
+                            }else if(command_buffer.compare("sqrt") == 0){
+                                buffer = (buffer >= 0)?sqrt(buffer):0;
+                            }else if(command_buffer.compare("exp") == 0){
+                                buffer = exp(buffer);
+                            }else if(command_buffer.compare("ln")==0){
+                                buffer = log (buffer);
+                            }else if(command_buffer.compare("log")==0){
+                                buffer = (log (base) / log (buffer));
+                            }else if(command_buffer.compare("abs")==0){
+                                buffer = std::abs(buffer);
+                            }else if(command_buffer.compare("")!=0){
+                                throw 3;
+                            }
+                            base = 0;
+                            str_buffer = "";
+                            command_buffer = "";
+                        }else{
+                            str_buffer += formula[i];
+                        }
+                    }else{
+                        str_buffer += formula[i];
+                    }
+                }
+                else{
+                    if(formula[i] == 'x' && formula[i-1]!='e' && formula[i+1]!='p'){
+                      if(buffer == 0){
+                          buffer = absicia;
+                      }else{
+                          throw 83; //put a star little red shit
+                      }
+                    }else if(int(formula[i]) >= int('0') && int(formula[i]) <= int('9')){
+                      if(constant == false){
+                        if(buffer != 0 && !decimal){
+                          buffer *= 10;
+                        }
+                        buffer += int(formula[i]) - int('0');
+                        if(decimal && (int(formula[i]) - int('0'))!=0){
+                            buffer *= 0.1;
+                        }
+                      }else{
+                        throw 20;
+                      }
+                    }else if(formula[i] == '.'){
+                        decimal = true;
+                    }else if(formula[i] == '('){
+                        parenthesis = true;
+                        parenthesis_counter++;
+                    }else if(formula[i] == '-' || formula[i] == '+'){
+                        constant = false;
+                        if(operation != ' '){
+                            if (operation == '*' || operation == '/' || operation == '^')
+                            {
+                                if(buffer == 0 &&  operation == '/'){throw 60;}// ahah 8/0
+                                buffer = compute(buffer2, buffer, operation);
+                                operation = (operation2 == ' ')?'+':operation2;
+                                operation2 = ' ';
+                            }
+                            resutlt = compute(resutlt, buffer, operation);
+                        }else{
+                            resutlt = buffer;
+                        }
+                        buffer = 0;
+                        decimal = false;
+                        operation = formula[i];
+                    }else if(formula[i] == '*' || formula[i] == '/' || formula[i] == '^'){
+                        constant = false;
+                        if (operation == '*' || operation == '/' || operation == '^')
+                        {
+                            if(buffer == 0 &&  operation == '/'){throw 60;}// ahah 8/0
+                            buffer = compute(buffer2, buffer, operation);
+                            operation = operation2;
+                        }
+                        operation2 = operation;
+                        buffer2 = buffer;
+                        buffer = 0;
+                        decimal = false;
+                        operation = formula[i];
+                    }else{
+                        command_buffer += formula[i];
+                        if(command_buffer.compare("pi")==0){
+                          if(buffer == 0){
+                            buffer = 3.14159265358979323846;
+                            constant = true;
+                          }else{
+                            throw 20;
+                          }
+                        }
+                    }
+                }
+                //end parenthesis condition
             }
-            else {
-                f_decomposed.push_back(buffer);
-                f_iteration++;
+            //end space char condition
+        }
+        //end for loop
+        if (buffer != '0')
+        {
+            if(operation != ' '){
+                if (operation == '*' || operation == '/' || operation == '^')
+                {
+                    if(buffer == 0 &&  operation == '/'){throw 60;}// ahah 8/0
+                    buffer = compute(buffer2, buffer, operation);
+                    operation = (operation2 == ' ')?'+':operation2;
+                    operation2 = ' ';
+                }
+                resutlt = compute(resutlt, buffer, operation);
+            }else{
+                resutlt = buffer;
             }
-            buffer[0] = "";
-            buffer[1] = "";
         }
-        else {
-            this->f_decomposed.push_back(buffer);
-            buffer[0] = "";
-            buffer[1] = "";
-            f_iteration++;
-        }
-    }
-}
-
-float Formula::operate(char operation, float a, float b) {
-    float result = 0;
-    switch (operation) {
-    case '^':
-        result = pow(a, b);
-        break;
-    case '/':
-        if (b) result = a / b;
-        break;
-    case '+':
-        result = a + b;
-        break;
-    case '-':
-        result = a - b;
-        break;
-    case '*':
-        result = a * b;
-        break;
-    default:
-        break;
-    }
-    return result;
-}
-
-float Formula::getY(float x) {
-    float value;
-    for (int i = 0; i < f_iteration; i++) {
-        if (f_decomposed[i][1] == "unknown") {
-            f_decomposed[i][0] = std::to_string(x);
-        }
-    }
-
-    if (f_decomposed[0][1] != "integer" && f_decomposed[0][1] != "unknown") {
+        //std::cout << "resutlt = " << resutlt << std::endl << std::endl;
+        return resutlt;
+    }catch(int e){
+        std::cout << "computation stop with the key error number " << e << std::endl;
         return 0;
     }
-    else {
-        std::string::size_type sz;
-        value = std::stof( f_decomposed[0][0], &sz);
-    }
-    for (int i = 1; i < f_iteration; i++) {
-        if (isOperation(f_decomposed[i][0][0])) {
-            std::string::size_type sz;
-            value = operate(f_decomposed[i][0][0], value, std::stof(f_decomposed[i + 1][0], &sz));
-            //std::cout << x << ":" << value << std::endl;
-            //std::cout << "value = " << value << "; f_decomposed [i][0][0]" << std::endl;
-            i++;
-        }
-    }
-    //std::cout << value << ";" << f_decomposed[0][0] << std::endl;
-    return value;
-}
-
-void Formula::readFormula(std::string input) {
-
 }

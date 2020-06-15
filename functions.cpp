@@ -77,7 +77,7 @@ void drawFunction(Formula* formula, float ratio_, float centerX, float centerY, 
     for (int i = 0; i < sizeX; i++)
     {
         mathX += 1/ratio_;
-        y = centerY - ratio_ * (formula->getY(mathX));
+        y = centerY - ratio_ * (formula->getOrdinate(mathX));
         circle.setPosition(sf::Vector2f(i-1, y-1));
         window->draw(circle);
     }
