@@ -91,8 +91,10 @@ Formula* textField::eventget(sf::Event event, sf::RenderWindow* window, Formula*
                             window->display();
                         }else if(event.text.unicode == 8){
                             sf::String bufferStr = "";
-                            for(int i = 0; i < entered.getSize()-1; i++){
-                                bufferStr += entered[i];
+                            if(bufferStr.getSize() > 0){
+                                for(int i = 0; i < entered.getSize()-1; i++){
+                                    bufferStr += entered[i];
+                                }
                             }
                             entered = "";
                             entered = bufferStr;
