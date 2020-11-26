@@ -27,6 +27,12 @@
 *.lib
 
 # Executables
-*.exe
 *.out
 *.app
+
+*.cbp
+*.yml
+*.depend
+calculator.layout
+*.rar
+.idea
